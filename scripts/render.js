@@ -4,51 +4,62 @@
  */
 import { chromium } from 'playwright';
 import { spawn } from 'child_process';
-import path from 'path';
+import waitOn from 'wait-on';
 
 async function render() {
-  console.log('🚀 Starting render process...');
-  
-  // 1. Start the server
+  const PORT = process.env.PORT || 3000;
+  const URL = `http://localhost:${PORT}`;
+
+  console.log('🚀 Starting dev server...');
   const server = spawn('npm', ['run', 'dev'], {
-    env: { ...process.env, PORT: '3000' },
-    shell: true
+    env: { ...process.env, PORT: PORT.toString() },
+    shell: true,
+    stdio: 'inherit'
   });
 
-  // Wait for server to be ready
-  await new Promise(resolve => setTimeout(resolve, 5000));
+  try {
+    console.log(`⏳ Waiting for ${URL}...`);
+    await waitOn({ resources: [URL], timeout: 30000 });
+    console.log('✅ Server is ready!');
 
-  const browser = await chromium.launch();
-  const page = await browser.newPage({
-    viewport: { width: 1920, height: 1080 },
-    deviceScaleFactor: 1,
-  });
+    const browser = await chromium.launch();
+    const page = await browser.newPage({
+      viewport: { width: 1920, height: 1080 },
+      deviceScaleFactor: 1,
+      recordVideo: {
+        dir: './recordings',
+        size: { width: 1920, height: 1080 }
+      }
+    });
 
-  console.log('🌐 Loading application...');
-  await page.goto('http://localhost:3000');
-  
-  // Wait for the fiverr watermark or some element to be sure it's loaded
-  await page.waitForSelector('#video-container');
+    console.log('🌐 Loading application...');
+    await page.goto(URL);
+    await page.waitForSelector('#video-container');
 
-  console.log('📹 Recording animation (37.94s)...');
-  
-  // Click play button (this assumes your UI has a start button)
-  // Or we can manually set the time state if we exposed it to window, 
-  // but for a simple capture we just run it.
-  await page.click('button:has-text("Play")');
+    console.log('📹 Starting video playback...');
+    // The play button is the large one in the middle
+    await page.click('button:has(svg)'); 
 
-  // Record for the duration
-  // In a professional setup, we would use 'timesnap' or 'remotion' 
-  // for frame-perfect sync, but this is a standard capture.
-  await page.video().path(); // Playwright can record video automatically
-  
-  // Wait for the full duration
-  await new Promise(resolve => setTimeout(resolve, 39000)); 
+    const durationMs = 38500; // Slightly more than 37.94s
+    console.log(`⏳ Recording for ${durationMs/1000}s...`);
+    await page.waitForTimeout(durationMs);
 
-  await browser.close();
-  server.kill();
-  
-  console.log('✅ Render complete! Check the artifacts.');
+    console.log('💾 Saving video...');
+    const videoPath = await page.video().path();
+    console.log(`🎬 Video recorded to: ${videoPath}`);
+
+    // In a real flow, we'd move this to the final video.mp4
+    // But Playwright puts it in recordings/ by default above.
+    
+    await browser.close();
+    console.log('✅ Render complete!');
+  } catch (error) {
+    console.error('❌ Render failed:', error);
+    process.exit(1);
+  } finally {
+    console.log('🛑 Shutting down server...');
+    server.kill();
+  }
 }
 
-render().catch(console.error);
+render();
