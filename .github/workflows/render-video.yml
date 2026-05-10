@@ -1,0 +1,40 @@
+name: Render Promo Video
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Install Playwright
+        run: |
+          npx playwright install-deps
+          npx playwright install chromium
+
+      - name: Build App
+        run: npm run build
+
+      - name: Render Video
+        run: node scripts/render.js
+        env:
+          PORT: 3000
+
+      - name: Upload Video
+        uses: actions/upload-artifact@v4
+        with:
+          name: kinetic-typo-video
+          path: video.mp4
