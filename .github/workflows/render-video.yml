@@ -22,21 +22,11 @@ jobs:
           npm ci || npm install
           npm rebuild @tailwindcss/oxide
 
-      - name: Install Playwright
-        run: |
-          npx playwright install-deps
-          npx playwright install chromium
-
-      - name: Build App
-        run: npm run build
-
       - name: Render Video
-        run: node scripts/render.js
-        env:
-          PORT: 3000
+        run: npm run render
 
       - name: Upload Video
         uses: actions/upload-artifact@v4
         with:
           name: kinetic-typo-video
-          path: recordings/
+          path: video.mp4

@@ -66,32 +66,32 @@ const Scene1: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const wantToOpacity = interpolate(frame - 10, [0, 11], [0, 1], { extrapolateLeft: 'clamp' });
-  const wantToScaleX = interpolate(frame - 10, [0, 11], [3, 1], { extrapolateLeft: 'clamp' });
-  const wantToX = interpolate(frame - 10, [0, 11], [100, 0], { extrapolateLeft: 'clamp' });
+  const wantToOpacity = interpolate(frame, [0, 11], [0, 1], { extrapolateLeft: 'clamp' });
+  const wantToScaleX = interpolate(frame, [0, 11], [3, 1], { extrapolateLeft: 'clamp' });
+  const wantToX = interpolate(frame, [0, 11], [100, 0], { extrapolateLeft: 'clamp' });
 
-  const increaseBlur = interpolate(frame - 21, [0, 14], [20, 0], { extrapolateLeft: 'clamp' });
-  const increaseX = interpolate(frame - 21, [0, 14], [-100, 0], { extrapolateLeft: 'clamp' });
-  const increaseOpacity = interpolate(frame - 21, [0, 5], [0, 1], { extrapolateLeft: 'clamp' });
+  const increaseBlur = interpolate(frame - 11, [0, 14], [20, 0], { extrapolateLeft: 'clamp' });
+  const increaseX = interpolate(frame - 11, [0, 14], [-100, 0], { extrapolateLeft: 'clamp' });
+  const increaseOpacity = interpolate(frame - 11, [0, 5], [0, 1], { extrapolateLeft: 'clamp' });
 
-  const yourX = interpolate(frame - 35, [0, 10], [100, 0], { extrapolateLeft: 'clamp' });
-  const yourOpacity = interpolate(frame - 35, [0, 5], [0, 1], { extrapolateLeft: 'clamp' });
+  const yourX = interpolate(frame - 25, [0, 10], [100, 0], { extrapolateLeft: 'clamp' });
+  const yourOpacity = interpolate(frame - 25, [0, 5], [0, 1], { extrapolateLeft: 'clamp' });
 
-  const salBounce = spring({ frame: frame - 35, fps, config: { stiffness: 150, damping: 10 } });
+  const salBounce = spring({ frame: frame - 25, fps, config: { stiffness: 150, damping: 10 } });
   
   return (
     <AbsoluteFill style={{ paddingLeft: '15%', paddingTop: '10%' }}>
-      {frame >= 10 && (
+      {frame >= 0 && (
         <div style={{
           fontSize: 60, fontWeight: 900, color: '#1E2228',
           opacity: wantToOpacity,
           transform: `translateX(${650 + wantToX}px) translateY(100px) scaleX(${wantToScaleX})`,
-          filter: frame < 21 ? 'blur(10px)' : 'none',
+          filter: frame < 11 ? 'blur(10px)' : 'none',
         }}>
           WANT TO
         </div>
       )}
-      {frame >= 21 && (
+      {frame >= 11 && (
         <div style={{
           fontSize: 200, fontWeight: 900, color: 'white',
           opacity: increaseOpacity,
@@ -103,7 +103,7 @@ const Scene1: React.FC = () => {
         </div>
       )}
       <div style={{ display: 'flex', alignItems: 'flex-end', marginTop: 20 }}>
-        {frame >= 35 && (
+        {frame >= 25 && (
           <div style={{
             fontSize: 80, fontWeight: 900, color: '#1E2228', opacity: 0.8,
             transform: `translateX(${yourX}px)`,
@@ -111,41 +111,41 @@ const Scene1: React.FC = () => {
             YOUR
           </div>
         )}
-        {frame >= 35 && (
+        {frame >= 25 && (
           <div style={{
             fontSize: 140, fontWeight: 900, color: 'white', marginLeft: 40,
             transform: `scale(${1 + (1 - salBounce) * 0.15})`,
           }}>
             SAL
-            {frame >= 50 && (
+            {frame >= 40 && (
               <>
                 <span style={{ 
                   display: 'inline-block',
-                  opacity: interpolate(frame - 50, [0, 5], [0, 1]),
-                  transform: `translateX(${interpolate(frame - 50, [0, 10], [50, 0])}px)`
+                  opacity: interpolate(frame - 40, [0, 5], [0, 1]),
+                  transform: `translateX(${interpolate(frame - 40, [0, 10], [50, 0])}px)`
                 }}>E</span>
                 <span style={{ 
                   display: 'inline-block',
-                  opacity: interpolate(frame - 53, [0, 5], [0, 1]),
-                  transform: `translateX(${interpolate(frame - 53, [0, 10], [50, 0])}px)`
+                  opacity: interpolate(frame - 43, [0, 5], [0, 1]),
+                  transform: `translateX(${interpolate(frame - 43, [0, 10], [50, 0])}px)`
                 }}>S</span>
               </>
             )}
           </div>
         )}
-        {frame >= 65 && (
+        {frame >= 55 && (
           <div style={{ position: 'relative', width: 60, height: 120, marginLeft: 20 }}>
             <div style={{
               position: 'absolute', top: 0, left: 20, width: 20,
-              height: interpolate(frame - 65, [0, 5], [0, 80]),
+              height: interpolate(frame - 55, [0, 5], [0, 80]),
               border: '6px solid #1E2228',
               backgroundColor: 'transparent'
             }} />
-            {frame >= 71 && (
+            {frame >= 61 && (
               <div style={{
                 position: 'absolute', bottom: 10, left: 20, width: 20, height: 20,
                 backgroundColor: '#1E2228',
-                transform: `scale(${spring({ frame: frame - 71, fps, config: { stiffness: 200 } })})`
+                transform: `scale(${spring({ frame: frame - 61, fps, config: { stiffness: 200 } })})`
               }} />
             )}
           </div>
